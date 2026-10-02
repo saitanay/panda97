@@ -1,0 +1,34 @@
+{
+  "name": "panda97",
+  "version": "1.0.0",
+  "description": "LightPanda browser automation for pi coding agent via CDP. Lightweight, fast alternative to browse97 — no Chrome required.",
+  "author": "TASAI2401",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TASAI2401/panda97"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-browser",
+    "pi-lightpanda",
+    "browser",
+    "lightpanda",
+    "cdp",
+    "automation",
+    "web",
+    "scraping",
+    "form-fill",
+    "headless"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "type": "module"
+}
