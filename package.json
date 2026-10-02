@@ -1,6 +1,6 @@
 {
   "name": "panda97",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LightPanda browser automation for pi coding agent via CDP. Lightweight, fast alternative to browse97 — no Chrome required.",
   "author": "TASAI2401",
   "license": "MIT",
