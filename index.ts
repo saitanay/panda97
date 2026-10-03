@@ -568,21 +568,21 @@ export default function (pi: ExtensionAPI) {
 					(function() {
 						const fields = ${JSON.stringify(params.fields)};
 						const results = [];
+						function labelOf(el) {
+							if (el.id) { const lbl = document.querySelector('label[for="' + el.id + '"]'); if (lbl) return lbl.textContent.trim().toLowerCase(); }
+							const parent = el.closest("label");
+							if (parent) return parent.textContent.trim().toLowerCase().substring(0, 60);
+							const prev = el.previousElementSibling;
+							if (prev && prev.tagName === "LABEL") return prev.textContent.trim().toLowerCase();
+							return "";
+						}
 						function match(el, key) {
 							const k = key.toLowerCase();
 							const name = (el.getAttribute("name") || "").toLowerCase();
 							const id = (el.id || "").toLowerCase();
 							const placeholder = (el.getAttribute("placeholder") || "").toLowerCase();
 							const ariaLabel = (el.getAttribute("aria-label") || "").toLowerCase();
-							const label = (function() {
-								if (el.id) { const lbl = document.querySelector('label[for="' + el.id + '"]'); if (lbl) return lbl.textContent.trim().toLowerCase(); }
-								const parent = el.closest("label");
-								if (parent) return parent.textContent.trim().toLowerCase().substring(0, 60);
-								const prev = el.previousElementSibling;
-								if (prev && prev.tagName === "LABEL") return prev.textContent.trim().toLowerCase();
-								return "";
-							})();
-							return [name, id, placeholder, ariaLabel, label].some(c => c && (c === k || c.includes(k)));
+							return [name, id, placeholder, ariaLabel, labelOf(el)].some(c => c && (c === k || c.includes(k)));
 						}
 						for (const [key, value] of Object.entries(fields)) {
 							const inputs = document.querySelectorAll("input,textarea,select");
@@ -595,7 +595,11 @@ export default function (pi: ExtensionAPI) {
 									const opt = Array.from(el.options).find(o => o.textContent.trim().toLowerCase().includes(value.toLowerCase()) || o.value.toLowerCase().includes(value.toLowerCase()));
 									if (opt) { el.value = opt.value; el.dispatchEvent(new Event("change", {bubbles:true})); results.push(key + ": select \\"" + opt.textContent.trim().substring(0, 30) + "\\""); filled = true; break; }
 								} else if (type === "checkbox" || type === "radio") {
-									el.checked = true; el.dispatchEvent(new Event("change", {bubbles:true})); results.push(key + ": checked"); filled = true; break;
+									const val = (el.getAttribute("value") || "").toLowerCase();
+									const want = String(value).toLowerCase();
+									// the key usually matches the whole name group, so keep scanning until the wanted value/label matches
+									if (value !== true && want !== "true" && !(val + " " + labelOf(el)).includes(want)) continue;
+									el.checked = true; el.dispatchEvent(new Event("change", {bubbles:true})); results.push(key + " checked \"" + (val || labelOf(el)) + "\""); filled = true; break;
 								} else {
 									const setter = Object.getOwnPropertyDescriptor(tag === "textarea" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype, "value")?.set;
 									if (setter) setter.call(el, value); else el.value = value;
